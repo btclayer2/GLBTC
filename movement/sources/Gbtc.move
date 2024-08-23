@@ -34,7 +34,6 @@ module Gbtc::gbtc {
     /// Initialize metadata object and store the refs.
     // :!:>initialize
     fun init_module(admin: &signer) {
-        assert!(signer::address_of(admin) == @Gbtc, ENOT_OWNER);
         let constructor_ref = &object::create_named_object(admin, ASSET_SYMBOL);
         primary_fungible_store::create_primary_store_enabled_fungible_asset(
             constructor_ref,
