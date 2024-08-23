@@ -9,8 +9,8 @@ module Gbtc::gbtc {
     use std::string::{Self, utf8};
     use std::option;
 
-    /// Only fungible asset metadata owner can make changes.
-    const ENOT_OWNER: u64 = 1;
+    /// Only fungible asset metadata admin can make changes.
+    const ENOT_ADMIN: u64 = 1;
     /// The GBTC coin is paused.
     const EPAUSED: u64 = 2;
 
@@ -19,6 +19,7 @@ module Gbtc::gbtc {
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     /// Hold refs to control the minting, transfer and burning of fungible assets.
     struct ManagedFungibleAsset has key {
+        admin: address,
         mint_ref: MintRef,
         transfer_ref: TransferRef,
         burn_ref: BurnRef,
@@ -52,7 +53,7 @@ module Gbtc::gbtc {
         let metadata_object_signer = object::generate_signer(constructor_ref);
         move_to(
             &metadata_object_signer,
-            ManagedFungibleAsset { mint_ref, transfer_ref, burn_ref }
+            ManagedFungibleAsset { admin: signer::address_of(admin), mint_ref, transfer_ref, burn_ref }
         ); // <:!:initialize
 
         // Create a global state to pause the GBTC coin and move to Metadata object.
@@ -113,7 +114,7 @@ module Gbtc::gbtc {
     }
 
     // :!:>mint
-    /// Mint as the owner of metadata object.
+    /// Mint as the admin of metadata object.
     public entry fun mint(admin: &signer, to: address, amount: u64) acquires ManagedFungibleAsset {
         let asset = get_metadata();
         let managed_fungible_asset = authorized_borrow_refs(admin, asset);
@@ -122,7 +123,7 @@ module Gbtc::gbtc {
         fungible_asset::deposit_with_ref(&managed_fungible_asset.transfer_ref, to_wallet, gbtc);
     }// <:!:mint
 
-    /// Transfer as the owner of metadata object ignoring `frozen` field.
+    /// Transfer as the admin of metadata object ignoring `frozen` field.
     public entry fun transfer(from: &signer, to: address, amount: u64) acquires ManagedFungibleAsset, State {
         let from = signer::address_of(from);
         let asset = get_metadata();
@@ -133,7 +134,7 @@ module Gbtc::gbtc {
         deposit(to_wallet, gbtc, transfer_ref);
     }
 
-    /// Burn fungible assets as the owner of metadata object.
+    /// Burn fungible assets as the admin of metadata object.
     public entry fun burn(admin: &signer, from: address, amount: u64) acquires ManagedFungibleAsset {
         let asset = get_metadata();
         let burn_ref = &authorized_borrow_refs(admin, asset).burn_ref;
@@ -158,12 +159,20 @@ module Gbtc::gbtc {
     }
 
     /// Pause or unpause the transfer of GBTC coin. This checks that the caller is the pauser.
-    public entry fun set_pause(pauser: &signer, paused: bool) acquires State {
+    public entry fun set_pause(pauser: &signer, paused: bool) acquires State, ManagedFungibleAsset {
         let asset = get_metadata();
-        assert!(object::is_owner(asset, signer::address_of(pauser)), error::permission_denied(ENOT_OWNER));
+        let ref = borrow_global<ManagedFungibleAsset>(object::object_address(&asset));
+        assert!(ref.admin == signer::address_of(pauser), error::permission_denied(ENOT_ADMIN));
         let state = borrow_global_mut<State>(object::create_object_address(&@Gbtc, ASSET_SYMBOL));
         if (state.paused == paused) { return };
         state.paused = paused;
+    }
+
+    public entry fun transfer_admin(old_admin: &signer, new_admin: address) acquires ManagedFungibleAsset {
+        let asset = get_metadata();
+        let ref = borrow_global_mut<ManagedFungibleAsset>(object::object_address(&asset));
+        assert!(ref.admin == signer::address_of(old_admin), error::permission_denied(ENOT_ADMIN));
+        ref.admin = new_admin;
     }
 
     /// Assert that the GBTC coin is not paused.
@@ -174,13 +183,14 @@ module Gbtc::gbtc {
     }
 
     /// Borrow the immutable reference of the refs of `metadata`.
-    /// This validates that the signer is the metadata object's owner.
+    /// This validates that the signer is the metadata object's admin.
     inline fun authorized_borrow_refs(
-        owner: &signer,
+        admin: &signer,
         asset: Object<Metadata>,
     ): &ManagedFungibleAsset acquires ManagedFungibleAsset {
-        assert!(object::is_owner(asset, signer::address_of(owner)), error::permission_denied(ENOT_OWNER));
-        borrow_global<ManagedFungibleAsset>(object::object_address(&asset))
+        let ref = borrow_global<ManagedFungibleAsset>(object::object_address(&asset));
+        assert!(ref.admin == signer::address_of(admin), error::permission_denied(ENOT_ADMIN));
+        ref
     }
 
     /// Borrow the immutable reference of the refs of `metadata`.
@@ -231,6 +241,20 @@ module Gbtc::gbtc {
         let creator_address = signer::address_of(creator);
         mint(creator, creator_address, 100);
         set_pause(creator, true);
+        transfer(creator, @0xface, 10);
+    }
+
+    #[test(creator = @Gbtc, new_admin = @0xface)]
+    #[expected_failure(abort_code = 2, location = Self)]
+    fun test_transfer_admin(
+        creator: &signer,
+        new_admin: &signer
+    ) acquires ManagedFungibleAsset, State {
+        init_module(creator);
+        let creator_address = signer::address_of(creator);
+        transfer_admin(creator, signer::address_of(new_admin));
+        mint(new_admin, creator_address, 100);
+        set_pause(new_admin, true);
         transfer(creator, @0xface, 10);
     }
 }

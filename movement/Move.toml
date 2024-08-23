@@ -4,7 +4,7 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-Gbtc="0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255"
+Gbtc="0x4080ecaccec584280809ff8bbeb5948735f250e6159f68ca762268d7fd322475"
 
 [dev-addresses]
 
