@@ -21,7 +21,6 @@ movement-aptos-custom/node_modules/
 .ssh/
 *.exe
 .pypirc
-test/
 *lock.json
 docs
 record.txt
