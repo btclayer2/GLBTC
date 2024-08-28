@@ -1,4 +1,4 @@
-module Gbtc::gbtc {
+module GLbtc::glbtc {
     use aptos_framework::fungible_asset::{Self, MintRef, TransferRef, BurnRef, Metadata, FungibleAsset};
     use aptos_framework::object::{Self, Object};
     use aptos_framework::primary_fungible_store;
@@ -11,10 +11,10 @@ module Gbtc::gbtc {
 
     /// Only fungible asset metadata admin can make changes.
     const ENOT_ADMIN: u64 = 1;
-    /// The GBTC coin is paused.
+    /// The GLBTC coin is paused.
     const EPAUSED: u64 = 2;
 
-    const ASSET_SYMBOL: vector<u8> = b"GBTC";
+    const ASSET_SYMBOL: vector<u8> = b"GLBTC";
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     /// Hold refs to control the minting, transfer and burning of fungible assets.
@@ -26,7 +26,7 @@ module Gbtc::gbtc {
     }
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
-    /// Global state to pause the GBTC coin.
+    /// Global state to pause the GLBTC coin.
     /// OPTIONAL
     struct State has key {
         paused: bool,
@@ -39,7 +39,7 @@ module Gbtc::gbtc {
         primary_fungible_store::create_primary_store_enabled_fungible_asset(
             constructor_ref,
             option::none(),
-            utf8(b"GBTC Coin"), /* name */
+            utf8(b"GLBTC Coin"), /* name */
             utf8(ASSET_SYMBOL), /* symbol */
             8, /* decimals */
             utf8(b"http://example.com/favicon.ico"), /* icon */
@@ -56,7 +56,7 @@ module Gbtc::gbtc {
             ManagedFungibleAsset { admin: signer::address_of(admin), mint_ref, transfer_ref, burn_ref }
         ); // <:!:initialize
 
-        // Create a global state to pause the GBTC coin and move to Metadata object.
+        // Create a global state to pause the GLBTC coin and move to Metadata object.
         move_to(
             &metadata_object_signer,
             State { paused: false, }
@@ -65,15 +65,15 @@ module Gbtc::gbtc {
         // Override the deposit and withdraw functions which mean overriding transfer.
         // This ensures all transfer will call withdraw and deposit functions in this module
         // and perform the necessary checks.
-        // This is OPTIONAL. It is an advanced feature and we don't NEED a global state to pause the GBTC coin.
+        // This is OPTIONAL. It is an advanced feature and we don't NEED a global state to pause the GLBTC coin.
         let deposit = function_info::new_function_info(
             admin,
-            string::utf8(b"gbtc"),
+            string::utf8(b"glbtc"),
             string::utf8(b"deposit"),
         );
         let withdraw = function_info::new_function_info(
             admin,
-            string::utf8(b"gbtc"),
+            string::utf8(b"glbtc"),
             string::utf8(b"withdraw"),
         );
         dispatchable_fungible_asset::register_dispatch_functions(
@@ -87,22 +87,22 @@ module Gbtc::gbtc {
     #[view]
     /// Return the address of the managed fungible asset that's created when this module is deployed.
     public fun get_metadata(): Object<Metadata> {
-        let asset_address = object::create_object_address(&@Gbtc, ASSET_SYMBOL);
+        let asset_address = object::create_object_address(&@GLbtc, ASSET_SYMBOL);
         object::address_to_object<Metadata>(asset_address)
     }
 
-    /// Deposit function override to ensure that the account is not denylisted and the GBTC coin is not paused.
+    /// Deposit function override to ensure that the account is not denylisted and the GLBTC coin is not paused.
     /// OPTIONAL
     public fun deposit<T: key>(
         store: Object<T>,
-        gbtc: FungibleAsset,
+        glbtc: FungibleAsset,
         transfer_ref: &TransferRef,
     ) acquires State {
         assert_not_paused();
-        fungible_asset::deposit_with_ref(transfer_ref, store, gbtc);
+        fungible_asset::deposit_with_ref(transfer_ref, store, glbtc);
     }
 
-    /// Withdraw function override to ensure that the account is not denylisted and the GBTC coin is not paused.
+    /// Withdraw function override to ensure that the account is not denylisted and the GLBTC coin is not paused.
     /// OPTIONAL
     public fun withdraw<T: key>(
         store: Object<T>,
@@ -119,8 +119,8 @@ module Gbtc::gbtc {
         let asset = get_metadata();
         let managed_fungible_asset = authorized_borrow_refs(admin, asset);
         let to_wallet = primary_fungible_store::ensure_primary_store_exists(to, asset);
-        let gbtc = fungible_asset::mint(&managed_fungible_asset.mint_ref, amount);
-        fungible_asset::deposit_with_ref(&managed_fungible_asset.transfer_ref, to_wallet, gbtc);
+        let glbtc = fungible_asset::mint(&managed_fungible_asset.mint_ref, amount);
+        fungible_asset::deposit_with_ref(&managed_fungible_asset.transfer_ref, to_wallet, glbtc);
     }// <:!:mint
 
     /// Transfer as the admin of metadata object ignoring `frozen` field.
@@ -130,8 +130,8 @@ module Gbtc::gbtc {
         let transfer_ref = borrow_transfer_ref(asset);
         let from_wallet = primary_fungible_store::primary_store(from, asset);
         let to_wallet = primary_fungible_store::ensure_primary_store_exists(to, asset);
-        let gbtc = withdraw(from_wallet, amount, transfer_ref);
-        deposit(to_wallet, gbtc, transfer_ref);
+        let glbtc = withdraw(from_wallet, amount, transfer_ref);
+        deposit(to_wallet, glbtc, transfer_ref);
     }
 
     /// Burn fungible assets as the admin of metadata object.
@@ -158,12 +158,12 @@ module Gbtc::gbtc {
         fungible_asset::set_frozen_flag(transfer_ref, wallet, false);
     }
 
-    /// Pause or unpause the transfer of GBTC coin. This checks that the caller is the pauser.
+    /// Pause or unpause the transfer of GLBTC coin. This checks that the caller is the pauser.
     public entry fun set_pause(pauser: &signer, paused: bool) acquires State, ManagedFungibleAsset {
         let asset = get_metadata();
         let ref = borrow_global<ManagedFungibleAsset>(object::object_address(&asset));
         assert!(ref.admin == signer::address_of(pauser), error::permission_denied(ENOT_ADMIN));
-        let state = borrow_global_mut<State>(object::create_object_address(&@Gbtc, ASSET_SYMBOL));
+        let state = borrow_global_mut<State>(object::create_object_address(&@GLbtc, ASSET_SYMBOL));
         if (state.paused == paused) { return };
         state.paused = paused;
     }
@@ -175,10 +175,10 @@ module Gbtc::gbtc {
         ref.admin = new_admin;
     }
 
-    /// Assert that the GBTC coin is not paused.
+    /// Assert that the GLBTC coin is not paused.
     /// OPTIONAL
     fun assert_not_paused() acquires State {
-        let state = borrow_global<State>(object::create_object_address(&@Gbtc, ASSET_SYMBOL));
+        let state = borrow_global<State>(object::create_object_address(&@GLbtc, ASSET_SYMBOL));
         assert!(!state.paused, EPAUSED);
     }
 
@@ -200,7 +200,7 @@ module Gbtc::gbtc {
         &borrow_global<ManagedFungibleAsset>(object::object_address(&asset)).transfer_ref
     }
 
-    #[test(creator = @Gbtc)]
+    #[test(creator = @GLbtc)]
     fun test_basic_flow(
         creator: &signer,
     ) acquires ManagedFungibleAsset, State {
@@ -221,7 +221,7 @@ module Gbtc::gbtc {
         burn(creator, creator_address, 90);
     }
 
-    #[test(creator = @Gbtc, aaron = @0xface)]
+    #[test(creator = @GLbtc, aaron = @0xface)]
     #[expected_failure(abort_code = 0x50001, location = Self)]
     fun test_permission_denied(
         creator: &signer,
@@ -232,7 +232,7 @@ module Gbtc::gbtc {
         mint(aaron, creator_address, 100);
     }
 
-    #[test(creator = @Gbtc)]
+    #[test(creator = @GLbtc)]
     #[expected_failure(abort_code = 2, location = Self)]
     fun test_paused(
         creator: &signer,
@@ -244,7 +244,7 @@ module Gbtc::gbtc {
         transfer(creator, @0xface, 10);
     }
 
-    #[test(creator = @Gbtc, new_admin = @0xface)]
+    #[test(creator = @GLbtc, new_admin = @0xface)]
     #[expected_failure(abort_code = 2, location = Self)]
     fun test_transfer_admin(
         creator: &signer,

@@ -1,10 +1,10 @@
 [package]
-name = "GBTC"
+name = "GLBTC"
 version = "1.0.0"
 authors = []
 
 [addresses]
-Gbtc="0x4080ecaccec584280809ff8bbeb5948735f250e6159f68ca762268d7fd322475"
+GLbtc="0x4080ecaccec584280809ff8bbeb5948735f250e6159f68ca762268d7fd322475"
 
 [dev-addresses]
 

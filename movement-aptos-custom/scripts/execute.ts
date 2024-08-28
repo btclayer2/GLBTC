@@ -55,7 +55,7 @@ async function transferCoin(
     const transaction = await aptos.transaction.build.simple({
         sender: from.accountAddress,
         data: {
-            function: "0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::gbtc::transfer",
+            function: "0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::glbtc::transfer",
             functionArguments: [toAddress, amount],
         },
     });
@@ -71,7 +71,7 @@ async function mintCoin(admin: Account, receiver: AccountAddress, amount: AnyNum
     const transaction = await aptos.transaction.build.simple({
         sender: admin.accountAddress,
         data: {
-            function: `0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::gbtc::mint`,
+            function: `0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::glbtc::mint`,
             functionArguments: [receiver, amount],
         },
     });
@@ -87,7 +87,7 @@ async function burnCoin(admin: Account, fromAddress: AccountAddress, amount: Any
     const transaction = await aptos.transaction.build.simple({
         sender: admin.accountAddress,
         data: {
-            function: `0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::gbtc::burn`,
+            function: `0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::glbtc::burn`,
             functionArguments: [fromAddress, amount],
         },
     });
@@ -103,7 +103,7 @@ async function freeze(admin: Account, targetAddress: AccountAddress): Promise<st
     const transaction = await aptos.transaction.build.simple({
         sender: admin.accountAddress,
         data: {
-            function: `0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::gbtc::freeze_account`,
+            function: `0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::glbtc::freeze_account`,
             functionArguments: [targetAddress],
         },
     });
@@ -119,7 +119,7 @@ async function unfreeze(admin: Account, targetAddress: AccountAddress): Promise<
     const transaction = await aptos.transaction.build.simple({
         sender: admin.accountAddress,
         data: {
-            function: `0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::gbtc::unfreeze_account`,
+            function: `0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::glbtc::unfreeze_account`,
             functionArguments: [targetAddress],
         },
     });
@@ -130,7 +130,7 @@ async function unfreeze(admin: Account, targetAddress: AccountAddress): Promise<
     return pendingTxn.hash;
 }
 
-const getGbtcBalance = async (owner: AccountAddress, assetType: string): Promise<number> => {
+const getGLbtcBalance = async (owner: AccountAddress, assetType: string): Promise<number> => {
     const data = await aptos.getCurrentFungibleAssetBalances({
         options: {
             where: {
@@ -146,7 +146,7 @@ const getGbtcBalance = async (owner: AccountAddress, assetType: string): Promise
 /** Return the address of the managed fungible asset that's created when this module is deployed */
 async function getMetadata(admin: Account): Promise<string> {
     const payload: InputViewFunctionData = {
-        function: `0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::gbtc::get_metadata`,
+        function: `0xbd4f4d25b0410220516389f153071949232993af1ca43a9257c936cf60448255::glbtc::get_metadata`,
         functionArguments: [],
     };
     const res = (await aptos.view<[{ inner: string }]>({payload}))[0];
@@ -160,14 +160,14 @@ async function main() {
     const mintCoinTransactionHash = await mintCoin(account, account.accountAddress, 100);
     await aptos.waitForTransaction({transactionHash: mintCoinTransactionHash});
     console.log(
-        `Current fungible store balance: ${await getGbtcBalance(account.accountAddress, metadataAddress)}.`,
+        `Current fungible store balance: ${await getGLbtcBalance(account.accountAddress, metadataAddress)}.`,
     );
 
     const tmp_acc = new AccountAddress(hexStringToBytes("0xaa92e46ad151132bcbf4392eb4b10cd6060c28025988f47429aedc4e9a364fda"));
     const transferCoinTransactionHash = await transferCoin(account, tmp_acc, 100);
     await aptos.waitForTransaction({transactionHash: transferCoinTransactionHash});
     console.log(
-        `Current fungible store balance: ${await getGbtcBalance(tmp_acc, metadataAddress)}.`,
+        `Current fungible store balance: ${await getGLbtcBalance(tmp_acc, metadataAddress)}.`,
     );
 }
 
