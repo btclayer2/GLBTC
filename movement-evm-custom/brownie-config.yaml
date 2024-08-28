@@ -1,0 +1,26 @@
+# exclude SafeMath when calculating test coverage
+# https://eth-brownie.readthedocs.io/en/v1.10.3/config.html#exclude_paths
+reports:
+  exclude_contracts:
+    - SafeMath
+dependencies:
+  - OpenZeppelin/openzeppelin-contracts@4.6.0
+compiler:
+  solc:
+    version: 0.8.13
+    remappings:
+      - "@openzeppelin=OpenZeppelin/openzeppelin-contracts@4.6.0"
+# automatically fetch contract sources from Etherscan
+autofetch_sources: True
+dotenv: .env
+networks:
+  default: movement-test
+  movement-test:
+    chainid: 30732
+wallets:
+  from_key: ${PRIVATE_KEY}
+  deploy_key: ${DEPLOY_KEY}
+  # In order to deploy a unified contract address
+  create_key: ${CREATE_KEY}
+  bulk_key: ${BULK_KEY}
+  from_mnemonic: ${MNEMONIC}
