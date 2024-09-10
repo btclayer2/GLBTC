@@ -26,4 +26,9 @@ contract GLBTC is ERC20, Ownable {
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
     }
+
+    // Function for the owner to burn tokens
+    function burn(address account, uint256 amount) public onlyOwner {
+        _burn(account, amount);
+    }
 }
