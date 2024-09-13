@@ -41,8 +41,8 @@ def main(net="bevm-test"):
     p = load_project(net)
 
     # Deploy glbtc
-    name = "GLBTC"
-    symbol = "GLBTC"
+    name = "GL-BTC"
+    symbol = "GL-BTC"
     decimals = 8
     glbtc = p["GLBTC"].deploy(
         name,
@@ -55,25 +55,26 @@ def main(net="bevm-test"):
     print(f"glbtc address:", glbtc)
 
     # deploy glbtc adapter
-    glbtc_adapter = p["GLBTCAdapter"].deploy(
-        glbtc.address,
-        11501,
-        {"from": get_account(),
-         "gas_price": "0.05 gwei"
-         }
-    )
-    print(f"glbtc adapter address:", glbtc_adapter)
+    # glbtc_adapter = p["GLBTCAdapter"].deploy(
+    #     glbtc.address,
+    #     11501,
+    #     {"from": get_account(),
+    #      "gas_price": "0.05 gwei"
+    #      }
+    # )
+    # print(f"glbtc adapter address:", glbtc_adapter)
 
 
 def transferOwnership(net="bevm-test"):
     glbtc = load_glbtc(net)
-    glbtc_adapter = load_glbtc_adapter(net)
+    # glbtc_adapter = load_glbtc_adapter(net)
     # GG
-    owner = "0x209867e6430D75D0Aff27E217A6a51580Ef4C31e"
-    glbtc.transferOwnership(owner, {"from": get_account(), "gas_price": "0.05 gwei"})
-    glbtc_adapter.transferOwnership(owner, {"from": get_account(), "gas_price": "0.05 gwei"})
+    owner = "0x82d54cb5036165560ad648dea1312c268d827da5"
+    print(glbtc.address)
+    # glbtc.transferOwnership(owner, {"from": get_account(), "gas_price": "0.05 gwei"})
+    # glbtc_adapter.transferOwnership(owner, {"from": get_account(), "gas_price": "0.05 gwei"})
 
 
 if __name__ == "__main__":
-    main("bevm-test")
-    transferOwnership("bevm-test")
+    # main("bevm-main")
+    transferOwnership("bevm-main")
