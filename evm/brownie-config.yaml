@@ -18,9 +18,16 @@ dotenv: .env
 networks:
   default: bevm-test
   bevm-main:
-    chainid: 11501
+    glbtc: "0xd88C987cCd9e1BC1a6Cb36F8e24DA7fE3222aD90"
+  sepolia:
+    _lzEndpoint: "0xae92d5aD7583AD66E49A0c67BAd18F6ba52dDDc1"
+    glbtc: "0xbc5f04bFdf589F460F756746b6AAB4522ffCFAeD"
   bevm-test:
-    chainid: 11503
+    glbtc: "0x5AB267E44F1A9c5CA11950cfD33DC8F61b135E62"
+  avax-test:
+    _lzEndpoint: "0x93f54D755A063cE7bB9e6Ac47Eccc8e33411d706"
+    glbtc: "0x2fE7f982f2f4C10210B4A8cA059d0a4EC3F6E8fA"
+    glbtcoft: "0x54005C207988294004Ab4a9B2DB3a32901fa9A36"
 wallets:
   from_key: ${PRIVATE_KEY}
   deploy_key: ${DEPLOY_KEY}
