@@ -15,7 +15,7 @@ module oft::gl_bitcoin {
     }
 
     public fun initialize(account: &signer) {
-        let lz_cap = oft::init_oft<GlobalLiquidityBTC>(account, b"Global Liquidity Bitoin", b"glBTC", 8, 6);
+        let lz_cap = oft::init_oft<GlobalLiquidityBTC>(account, b"Global Liquidity Bitoin", b"GLBTC", 8, 8);
 
         move_to(account, Capabilities {
             lz_cap,

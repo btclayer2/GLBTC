@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from brownie import network, project, accounts, config, Contract
+from brownie import network, project, accounts, config, Contract, web3
 from brownie.network.account import Account
 
 
@@ -82,15 +82,14 @@ def setTrustedRemoteAddress(net="sepolia"):
 
     # aptos-mainnet
     # remoteChainID = 108
-    # remoteAddress = "0x543c5660aa4d496687e2068c11765f04607c4f4b639a83233a9333604fb8ce59"
+    # remoteAddress = "0x46f31ff67d1c18824d69dfc4dadaedf6d9e892464d191784527a40b8626bb419"
 
     # aptos-testnet
     remoteChainID = 10108
-    remoteAddress = "0x543c5660aa4d496687e2068c11765f04607c4f4b639a83233a9333604fb8ce59"
+    remoteAddress = "0x46f31ff67d1c18824d69dfc4dadaedf6d9e892464d191784527a40b8626bb419"
     glbtcoft.setTrustedRemoteAddress(
         remoteChainID,
-        remoteAddress
-        ,
+        remoteAddress,
         {"from": get_account()}
     )
 
@@ -118,6 +117,43 @@ def setMinDstGas(net="sepolia"):
     )
 
 
+def sendFrom(net="sepolia"):
+    glbtc = load_glbtc(net)
+    glbtcoft = load_glbtcoft(net)
+    acc = get_account()
+
+    senderAddress = acc.address
+
+    # aptos-testnet
+    remoteChainID = 10108
+
+    recipientAddress = "0x46f31ff67d1c18824d69dfc4dadaedf6d9e892464d191784527a40b8626bb419"
+    amountToSend = int(0.1 * 1e8)
+
+    param1 = 1  # uint16
+    param2 = 200000  # uint256
+    adapterParams = web3.codec.encode_abi(['uint16', 'uint256'], [param1, param2])
+
+    glbtc.approve(glbtcoft.address, amountToSend, {"from": acc})
+
+    glbtcoft.sendFrom(
+        senderAddress,
+        remoteChainID,
+        recipientAddress,
+        amountToSend,
+        [
+            senderAddress,  # refundAddress (address payable)
+            "0x0000000000000000000000000000000000000000",  # zroPaymentAddress (address)
+            "0x00010000000000000000000000000000000000000000000000000000000000030d40"
+        ],
+        {"from": acc,
+         "value": int(0.2 * 1e18)
+         }
+    )
+
+
 if __name__ == "__main__":
     # deploy_glbtcoft("avax-test")
-    setMinDstGas("avax-test")
+    # setTrustedRemoteAddress("avax-test")
+    # setMinDstGas("avax-test")
+    sendFrom("avax-test")
