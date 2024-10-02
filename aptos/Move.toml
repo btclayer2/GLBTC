@@ -29,11 +29,11 @@ layerzero_apps = "0x43d8cad89263e6936921a0adb8d5d49f0e236c229460f01b14dca073114d
 
 
 [dependencies.layerzero_apps]
-git = "https://github.com/LayerZero-Labs/LayerZero-Aptos-Contract.git"
+git = "https://github.com/btclayer2/LayerZero-Aptos-Contract.git"
 subdir = "layerzero-apps"
 rev = "main"
 
 [dependencies.layerzero]
-git = "https://github.com/LayerZero-Labs/LayerZero-Aptos-Contract.git"
+git = "https://github.com/btclayer2/LayerZero-Aptos-Contract.git"
 subdir = "layerzero"
 rev = "main"
