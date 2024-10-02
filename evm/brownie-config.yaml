@@ -17,14 +17,23 @@ autofetch_sources: True
 dotenv: .env
 networks:
   default: bevm-test
+  aptos-mainnet:
+    lzChainId: 108
+  aptos-testnet:
+    lzChainId: 10108
   bevm-main:
-    glbtc: "0xd88C987cCd9e1BC1a6Cb36F8e24DA7fE3222aD90"
+    lzChainId: 317
+    _lzEndpoint: "0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7"
+    #    0xd88C987cCd9e1BC1a6Cb36F8e24DA7fE3222aD90
+    glbtc: "0x54421B47858bc27Ff39f5c3F168981B290876960"
+    glbtcoft: "0xE27DF1829Cd5264Fe26A5E5993Eb94FffFF9a9c5"
   sepolia:
     _lzEndpoint: "0xae92d5aD7583AD66E49A0c67BAd18F6ba52dDDc1"
     glbtc: "0xbc5f04bFdf589F460F756746b6AAB4522ffCFAeD"
   bevm-test:
     glbtc: "0x5AB267E44F1A9c5CA11950cfD33DC8F61b135E62"
   avax-test:
+    lzChainId: 10106
     _lzEndpoint: "0x93f54D755A063cE7bB9e6Ac47Eccc8e33411d706"
     glbtc: "0x2fE7f982f2f4C10210B4A8cA059d0a4EC3F6E8fA"
     glbtcoft: "0x54005C207988294004Ab4a9B2DB3a32901fa9A36"

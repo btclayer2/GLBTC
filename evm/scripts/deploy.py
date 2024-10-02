@@ -77,47 +77,38 @@ def deploy_glbtcoft(net="sepolia"):
     print(f"GLBTCOFT address:{glbtcoft.address}")
 
 
-def setTrustedRemoteAddress(net="sepolia"):
+def setTrustedRemoteAddress(net="sepolia", dst_net="aptos-mainnet"):
     glbtcoft = load_glbtcoft(net)
 
-    # aptos-mainnet
-    # remoteChainID = 108
-    # remoteAddress = "0x46f31ff67d1c18824d69dfc4dadaedf6d9e892464d191784527a40b8626bb419"
-
     # aptos-testnet
-    remoteChainID = 10108
+    remoteChainID = config["networks"][dst_net]["lzChainId"]
     remoteAddress = "0x46f31ff67d1c18824d69dfc4dadaedf6d9e892464d191784527a40b8626bb419"
     glbtcoft.setTrustedRemoteAddress(
         remoteChainID,
         remoteAddress,
-        {"from": get_account()}
+        {"from": get_account(), "gas_price": "0.05 gwei"}
     )
 
 
-def setMinDstGas(net="sepolia"):
+def setMinDstGas(net="sepolia", dst_net="aptos-mainnet"):
     glbtcoft = load_glbtcoft(net)
 
-    # aptos-mainnet
-    # remoteChainID = 108
-    # remoteAddress = "0x543c5660aa4d496687e2068c11765f04607c4f4b639a83233a9333604fb8ce59"
-
-    # aptos-testnet
-    remoteChainID = 10108
+    remoteChainID = config["networks"][dst_net]["lzChainId"]
     glbtcoft.setMinDstGas(
         remoteChainID,
         0,
         100000,
-        {"from": get_account()}
+        {"from": get_account(), "gas_price": "0.05 gwei"}
     )
     glbtcoft.setMinDstGas(
         remoteChainID,
         1,
         100000,
-        {"from": get_account()}
+        {"from": get_account(), "gas_price": "0.05 gwei"}
     )
 
 
-def sendFrom(net="sepolia"):
+def sendFrom(net="sepolia", dst_net="aptos-mainnet"):
     glbtc = load_glbtc(net)
     glbtcoft = load_glbtcoft(net)
     acc = get_account()
@@ -125,7 +116,7 @@ def sendFrom(net="sepolia"):
     senderAddress = acc.address
 
     # aptos-testnet
-    remoteChainID = 10108
+    remoteChainID = config["networks"][dst_net]["lzChainId"]
 
     recipientAddress = "0x46f31ff67d1c18824d69dfc4dadaedf6d9e892464d191784527a40b8626bb419"
     amountToSend = int(0.1 * 1e8)
@@ -134,7 +125,7 @@ def sendFrom(net="sepolia"):
     param2 = 200000  # uint256
     adapterParams = web3.codec.encode_abi(['uint16', 'uint256'], [param1, param2])
 
-    glbtc.approve(glbtcoft.address, amountToSend, {"from": acc})
+    glbtc.approve(glbtcoft.address, amountToSend, {"from": acc, "gas_price": "0.05 gwei"})
 
     glbtcoft.sendFrom(
         senderAddress,
@@ -147,13 +138,15 @@ def sendFrom(net="sepolia"):
             "0x00010000000000000000000000000000000000000000000000000000000000030d40"
         ],
         {"from": acc,
-         "value": int(0.2 * 1e18)
+         "value": int(0.00005 * 1e18),
+         "gas_price": "0.05 gwei"
          }
     )
 
 
 if __name__ == "__main__":
-    # deploy_glbtcoft("avax-test")
-    # setTrustedRemoteAddress("avax-test")
-    # setMinDstGas("avax-test")
-    sendFrom("avax-test")
+    # deploy_glbtc("bevm-main")
+    # deploy_glbtcoft("bevm-main")
+    # setMinDstGas(net="bevm-main", dst_net="aptos-mainnet")
+    # setTrustedRemoteAddress("bevm-main", dst_net="aptos-mainnet")
+    sendFrom(net="bevm-main", dst_net="aptos-mainnet")
