@@ -65,7 +65,7 @@ aptos move publish --url https://fullnode.mainnet.aptoslabs.com
 3. Quote fee
 
    ~~~shell
-   aptos move view --max-gas 10000 --function-id "0x43d8cad89263e6936921a0adb8d5d49f0e236c229460f01b14dca073114df2b9::oft::quote_fee" --type-args "0x8304621d9c0f6f20b3b5d1bcf44def4ac5c8bf7c11a1ce80b53778532396312b::gl_bitcoin::GlobalLiquidityBTC" --args "u64:317" "hex:0000000000000000000000002dA7e3a7F21cCE79efeb66f3b082196EA0A8B9af" u64:1000  bool:false "hex:" "hex:" --url https://fullnode.mainnet.aptoslabs.com
+   aptos move run --local --max-gas 10000 --function-id "0x43d8cad89263e6936921a0adb8d5d49f0e236c229460f01b14dca073114df2b9::oft::quote_fee" --type-args "0x8304621d9c0f6f20b3b5d1bcf44def4ac5c8bf7c11a1ce80b53778532396312b::gl_bitcoin::GlobalLiquidityBTC" --args "u64:317" "hex:0000000000000000000000002dA7e3a7F21cCE79efeb66f3b082196EA0A8B9af" u64:1000  "bool:false" "hex:" "hex:" --url https://fullnode.mainnet.aptoslabs.com
    ~~~
    
 3. Send
