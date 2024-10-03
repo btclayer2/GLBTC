@@ -108,6 +108,17 @@ def setMinDstGas(net="sepolia", dst_net="aptos-mainnet"):
     )
 
 
+def custom_encode_packed(types, values):
+    result = b''
+    for t, v in zip(types, values):
+        if t == 'uint16':
+            result += v.to_bytes(2, byteorder='big')
+        elif t == 'uint256':
+            result += web3.toBytes(v).rjust(32, b'\0')
+        # 可以根据需要添加其他类型的处理
+    return "0x" + result.hex()
+
+
 def sendFrom(net="sepolia", dst_net="aptos-mainnet"):
     glbtc = load_glbtc(net)
     glbtcoft = load_glbtcoft(net)
@@ -123,11 +134,19 @@ def sendFrom(net="sepolia", dst_net="aptos-mainnet"):
 
     param1 = 1  # uint16
     param2 = 200000  # uint256
-    adapterParams = web3.codec.encode_abi(['uint16', 'uint256'], [param1, param2])
+    adapterParams = custom_encode_packed(['uint16', 'uint256'], [param1, param2])
 
     # glbtc.approve(glbtcoft.address, amountToSend, {"from": acc, "gas_price": "0.05 gwei"})
 
-    glbtcoft.sendFrom(
+    fee = glbtcoft.estimateSendFee(
+        remoteChainID,
+        recipientAddress,
+        amountToSend,
+        False,
+        adapterParams
+    )[0]
+
+    glbtcoft.sendFrom.estimate_gas(
         senderAddress,
         remoteChainID,
         recipientAddress,
@@ -135,10 +154,10 @@ def sendFrom(net="sepolia", dst_net="aptos-mainnet"):
         [
             senderAddress,  # refundAddress (address payable)
             "0x0000000000000000000000000000000000000000",  # zroPaymentAddress (address)
-            "0x00010000000000000000000000000000000000000000000000000000000000030d40"
+            adapterParams
         ],
         {"from": acc,
-         "value": int(0.00004 * 1e18),
+         "value": fee,
          "gas_price": "0.05 gwei"
          }
     )
