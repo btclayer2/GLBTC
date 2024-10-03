@@ -3,7 +3,7 @@ name = "oft"
 version = "0.0.1"
 
 [addresses]
-oft = "0x46f31ff67d1c18824d69dfc4dadaedf6d9e892464d191784527a40b8626bb419"
+oft = "0x8304621d9c0f6f20b3b5d1bcf44def4ac5c8bf7c11a1ce80b53778532396312b"
 
 # LayerZero Testnet Addresses
 # layerzero = "0x1759cc0d3161f1eb79f65847d4feb9d1f74fb79014698a23b16b28b9cd4c37e3"

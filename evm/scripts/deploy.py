@@ -72,7 +72,7 @@ def deploy_glbtcoft(net="sepolia"):
         token,
         _sharedDecimals,
         _lzEndpoint,
-        {"from": get_account()}
+        {"from": get_account(), "gas_price": "0.05 gwei"}
     )
     print(f"GLBTCOFT address:{glbtcoft.address}")
 
@@ -82,7 +82,7 @@ def setTrustedRemoteAddress(net="sepolia", dst_net="aptos-mainnet"):
 
     # aptos-testnet
     remoteChainID = config["networks"][dst_net]["lzChainId"]
-    remoteAddress = "0x46f31ff67d1c18824d69dfc4dadaedf6d9e892464d191784527a40b8626bb419"
+    remoteAddress = "0x8304621d9c0f6f20b3b5d1bcf44def4ac5c8bf7c11a1ce80b53778532396312b"
     glbtcoft.setTrustedRemoteAddress(
         remoteChainID,
         remoteAddress,
@@ -118,14 +118,14 @@ def sendFrom(net="sepolia", dst_net="aptos-mainnet"):
     # aptos-testnet
     remoteChainID = config["networks"][dst_net]["lzChainId"]
 
-    recipientAddress = "0x46f31ff67d1c18824d69dfc4dadaedf6d9e892464d191784527a40b8626bb419"
-    amountToSend = int(0.1 * 1e8)
+    recipientAddress = "0x8304621d9c0f6f20b3b5d1bcf44def4ac5c8bf7c11a1ce80b53778532396312b"
+    amountToSend = int(0.0001 * 1e8)
 
     param1 = 1  # uint16
     param2 = 200000  # uint256
     adapterParams = web3.codec.encode_abi(['uint16', 'uint256'], [param1, param2])
 
-    glbtc.approve(glbtcoft.address, amountToSend, {"from": acc, "gas_price": "0.05 gwei"})
+    # glbtc.approve(glbtcoft.address, amountToSend, {"from": acc, "gas_price": "0.05 gwei"})
 
     glbtcoft.sendFrom(
         senderAddress,
@@ -138,7 +138,7 @@ def sendFrom(net="sepolia", dst_net="aptos-mainnet"):
             "0x00010000000000000000000000000000000000000000000000000000000000030d40"
         ],
         {"from": acc,
-         "value": int(0.00005 * 1e18),
+         "value": int(0.00004 * 1e18),
          "gas_price": "0.05 gwei"
          }
     )
